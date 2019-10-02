@@ -192,7 +192,7 @@ An aim of partsbin is to provide an ever-accreting set of implementations of 'ig
   * vX, where X is the latest major version of the API being wrapped. For example, `clojure.java.jdbc.v0` corresponds to the latest released major version of this library (0.7.10 as of this writing). This version will not be produced until it is deemed stable. If a stable API version is determined to be wanting, a new ns should be created (vX_0 or whatever). If it corresponds to the latest version of the API, the core derivation should also be updated.
   * Note that this has a few consequences. Alpha can be unstable. Core can change but should be relatively stable. vX should always be stable/accrete-only. If you want guaranteed behavior, use a vX ns or just vendor and modify your own implementation.
 * I often provide a basic config in each core ns as well as a comment that contains an example to launch the config, this making each implementation self-documenting.
-* All libraries are set to :scope "provided" in the project.clj file. This is done to prevent users of the project from depending on every single part. This does mean that you, the user, must identify which parts you want and which jars you must include in your path to make everything work.
+* All libraries are set to :scope "provided" in the project.clj file. This is done to prevent users of the project from depending on every single part. This does mean that you, the user, must identify which parts you want and which jars you must include in your path to make everything work. Any ns that you require must have its dependencies explicitly included by you.
 * I will happily examine PRs if you want to add more part implementations.
 
 <hr/>
