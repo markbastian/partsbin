@@ -1,5 +1,5 @@
-(defproject partsbin "0.1.0-SNAPSHOT"
-  :description "FIXME: write description"
+(defproject markbastian/partsbin "0.1.0-SNAPSHOT"
+  :description "A project for creating functional, data-driven systems."
   :url "http://example.com/FIXME"
   :license {:name "Eclipse Public License"
             :url "http://www.eclipse.org/legal/epl-v10.html"}

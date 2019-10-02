@@ -7,14 +7,25 @@
   (system [this])
   (start [this])
   (stop [this])
-  (restart [this]))
+  (restart [this])
+  (swap-config! [this f])
+  (reset-config! [this config]))
 
-(defn create [config]
-  (let [state (atom nil)]
+(defn create [cfg]
+  (let [config (atom cfg)
+        state (atom nil)]
     (reify IGSys
       (system [this] @state)
-      (start [this] (if @state @state (swap! state (fn [_] (ig/init config)))))
+      (start [this] (if @state @state (swap! state (fn [_] (ig/init @config)))))
       (stop [this] (when @state (swap! state ig/halt!)))
       (restart [this] (do
                         (stop this)
-                        (start this))))))
+                        (start this)))
+      (swap-config! [this f]
+        (do
+          (stop this)
+          (swap! config f)))
+      (reset-config! [this new-config]
+        (do
+          (stop this)
+          (reset! config new-config))))))

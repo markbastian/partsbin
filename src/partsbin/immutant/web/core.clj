@@ -1,4 +1,4 @@
-(ns partsbin.immutant.web.latest
+(ns partsbin.immutant.web.core
   (:require [partsbin.immutant.web.v2 :as web]
             [integrant.core :as ig]))
 

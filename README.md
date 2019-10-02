@@ -7,7 +7,7 @@ This is partsbin - a set of reusable components and a philosophy for building si
 The goal of this project is to:
 
 1. Provide some best practices for designing simple, composable systems.
-1. Provide a few useful functions for working with [Integrant](https://github.com/weavejester/integrant) or similar libraries. As such, when the namespace alias `ig` is used we are referring to `[integrant.core :as ig]`.
+1. Provide a few useful functions for working with [Integrant](https://github.com/weavejester/integrant) or similar libraries. As such, when the namespace alias `ig` is used I am referring to `[integrant.core :as ig]`.
 1. Provide reference implementations for some common parts.
 
 As such, it can be used in a few ways:
@@ -18,7 +18,7 @@ As such, it can be used in a few ways:
 
 ## Definitions
 
-Since we have multiple frameworks out there for reloadable systems (e.g. [Integrant](https://github.com/weavejester/integrant), [Component](https://github.com/stuartsierra/component), [Mount](https://github.com/tolitius/mount), we need to clarify the following for this discussion:
+Since there are multiple frameworks out there for reloadable systems (e.g. [Integrant](https://github.com/weavejester/integrant), [Component](https://github.com/stuartsierra/component), [Mount](https://github.com/tolitius/mount), I need to clarify the following for this discussion:
 
 * A **system** is the top level set of components to be used. For this project, it is the result of calling `integrant.core/init`.
 * A **component** is a sub-element of a system which may have both init-time and runtime dependencies on other components in the system. I may also use 'part' interchangeably with component in this document.
@@ -66,7 +66,7 @@ The overarching aim of partsbin is to provide a conceptual framework that facili
 * Var quote (e.g. #'(foo) vs foo)) lambdas when they are passed in as config params. This will prevent you from having to reload your system when the function changes.
 * Ensure that ig/init *always* succeeds. If exceptional or failure behavior occurs (e.g. a DB is unavailable) it is ok to return a failed or broken state rather than just blowing up initialization. This facilitates investigation and recovery. For example, if you have a repl server running you could jack in and inspect the state or try to restart. If, on the other hand, the application has failed due to your exceptions you are in an irrecoverable and non-debuggable state.
 
-## Challenges
+### Challenges
 
 * If you detect cycles in your dependency graph you likely want to expose your _system_ in some aspect of your API downstream. For example, you want your system viewable from your web server API code. If this happens, this is your code telling you that you need to revisit your architecture since you are trying to make your system global. Instead, do this:
   * Change your API to use only the required capabilities of your system (e.g. a db or a web server) 
@@ -93,6 +93,24 @@ The right way to test this could be one of the following:
 ;Do this as much as you want.
 (doit conn arg)
 ```
+
+## Top Level Utility Methods
+
+Currently, there are two small nses that I use pervasively when building systems that I've captured here. The first is `partsbin.system`
+
+## Implementations
+
+An aim of partsbin is to provide an ever-accreting set of implementations of 'ig/init-key', 'ig/halt-key!' for a variety of libraries that you might use in your systems. To ensure that this is done thoughtfully the following strategy has been taken:
+
+* For each wrapped library, a package is created under partsbin.package.of.wrapped.lib, where the path corresponds to the same ns that would be imported from the library itself. For example, to obtain a jdbc connection using `clojure.java.jdbc`, the function `clojure.java.jdbc/get-connection` is called from the `clojure.java.jdbc` ns. In this case, I would create the package `partsbin.clojure.java.jdbc`.
+* Within the package I use versioned namespaces for each implementation. The following namespaces will be used:
+  * alpha: The alpha namespace is the latest non-stable version of the implementation. It is subject to change at any time.
+  * core: The core namespace contains a link to the latest stable (unless alpha is all that exists) version of the api. This is done by deriving the keys from the latest stable api in core.
+  * vX, where X is the latest major version of the API being wrapped. For example, `clojure.java.jdbc.v0` corresponds to the latest released major version of this library (0.7.10 as of this writing). This version will not be produced until it is deemed stable. If a stable API version is determined to be wanting, a new ns should be created (vX_0 or whatever). If it corresponds to the latest version of the API, the core derivation should also be updated.
+  * Note that this has a few consequences. Alpha can be unstable. Core can change but should be relatively stable. vX should always be stable/accrete-only. If you want guaranteed behavior, use a vX ns or just vendor and modify your own implementation.
+* I often provide a basic config in each core ns as well as a comment that contains an example to launch the config, this making each implementation self-documenting.
+* All libraries are set to :scope "provided" in the project.clj file. This is done to prevent users of the project from depending on every single part. This does mean that you, the user, must identify which parts you want and which jars you must include in your path to make everything work.
+* I will happily examine PRs if you want to add more part implementations.
 
 <hr/>
 

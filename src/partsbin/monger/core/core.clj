@@ -1,4 +1,4 @@
-(ns partsbin.monger.core.latest
+(ns partsbin.monger.core.core
   (:require [partsbin.monger.core.alpha :as monger]))
 
 (derive ::connection ::monger/connection)
