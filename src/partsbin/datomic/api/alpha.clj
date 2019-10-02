@@ -1,4 +1,4 @@
-(ns partsbin.datomic.api
+(ns partsbin.datomic.api.alpha
   (:require [integrant.core :as ig]
             [datomic.api :as d]))
 

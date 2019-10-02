@@ -1,8 +1,8 @@
 (ns partsbin.core
   (:require [partsbin.system :refer [create start stop restart system]]
-            [partsbin.datomic.api :as datomic]
+            [partsbin.datomic.api.latest :as datomic]
             [partsbin.immutant.web :as web]
-            [partsbin.clojure.java.jdbc :as jdbc]
+            [partsbin.clojure.java.jdbc.latest :as jdbc]
             [clojure.java.jdbc :as j]
             [integrant.core :as ig]))
 

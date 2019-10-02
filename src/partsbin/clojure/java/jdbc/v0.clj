@@ -1,4 +1,4 @@
-(ns partsbin.clojure.java.jdbc
+(ns partsbin.clojure.java.jdbc.v0
   (:require [integrant.core :as ig]
             [clojure.java.jdbc :as j])
   (:import (java.sql Connection)))

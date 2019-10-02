@@ -1,4 +1,4 @@
-(ns partsbin.immutant.web
+(ns partsbin.immutant.web.v2
   (:require [immutant.web :as immutant]
             [integrant.core :as ig]
             [partsbin.middleware :refer [wrap-component]]))

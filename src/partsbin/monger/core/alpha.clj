@@ -1,4 +1,4 @@
-(ns partsbin.monger.core
+(ns partsbin.monger.core.alpha
   (:require [monger.core :as mg]
             [integrant.core :as ig]))
 
