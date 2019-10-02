@@ -1,29 +1,31 @@
 (ns partsbin.core
-  (:require [partsbin.system :refer [create start stop restart system]]
-            [partsbin.datomic.api.core :as datomic]
-            [partsbin.immutant.web :as web]
-            [partsbin.clojure.java.jdbc.core :as jdbc]
-            [clojure.java.jdbc :as j]
-            [integrant.core :as ig]))
+  "A variant of the reloaded system idea. However, in this case the system is captured in an atom instead of a dynamic
+  var. This makes it more flexible and easy to have multiple independent systems if needed."
+  (:require [integrant.core :as ig]))
 
-(defn app [{:keys [sql-conn] :as request}]
-  (let [res (j/query sql-conn "SELECT 1")]
-    {:status 200 :body (str "OK - " (into [] res))}))
+(defprotocol IGSys
+  (system [this])
+  (start [this])
+  (stop [this])
+  (restart [this])
+  (swap-config! [this f])
+  (reset-config! [this config]))
 
-(def config
-  {::jdbc/connection    {:connection-uri "jdbc:h2:mem:mem_only"}
-   ::datomic/database   {:db-uri  "datomic:mem://example"
-                         :delete? true}
-   ::datomic/connection {:database (ig/ref ::datomic/database)
-                         :db-uri   "datomic:mem://example"}
-   ::web/server         {:host         "0.0.0.0"
-                         :port         3000
-                         :sql-conn     (ig/ref ::jdbc/connection)
-                         :datomic-conn (ig/ref ::datomic/connection)
-                         :handler      #'app}})
-
-(defonce sys (create config))
-
-(comment
-  (let [{:keys [::jdbc/connection]} (system sys)]
-    (j/query connection "SELECT 1")))
+(defn create [cfg]
+  (let [config (atom cfg)
+        state (atom nil)]
+    (reify IGSys
+      (system [this] @state)
+      (start [this] (if @state @state (swap! state (fn [_] (ig/init @config)))))
+      (stop [this] (when @state (swap! state ig/halt!)))
+      (restart [this] (do
+                        (stop this)
+                        (start this)))
+      (swap-config! [this f]
+        (do
+          (stop this)
+          (swap! config f)))
+      (reset-config! [this new-config]
+        (do
+          (stop this)
+          (reset! config new-config))))))

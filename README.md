@@ -96,7 +96,90 @@ The right way to test this could be one of the following:
 
 ## Top Level Utility Methods
 
-Currently, there are two small nses that I use pervasively when building systems that I've captured here. The first is `partsbin.system`
+Currently, there are two small nses that I use pervasively when building systems that I've captured here. The first is `partsbin.core`, which declares a simple protocol along the lines of what Component does along with some helper methods for modifying the default system configuration. For a similar effort see [integrant-repl](https://github.com/weavejester/integrant-repl). The main difference I take in my approach is that I use an atom along with a simple protocol to manage the system rather than a dynamic var so that it becomes easier to localize the system (or have many) versus a single (start), (stop), etc. set of functions. If you like those other systems better, feel free to use them.
+
+Should you want to try out my approach, it is as simple as what you see here:
+
+```
+(ns partsbin.example
+  (:require [partsbin.core :refer [create start stop restart system]]
+            [partsbin.datomic.api.core :as datomic]
+            [partsbin.immutant.web.core :as web]
+            [partsbin.clojure.java.jdbc.core :as jdbc]
+            [clojure.java.jdbc :as j]
+            [integrant.core :as ig]))
+
+(defn app [{:keys [sql-conn] :as request}]
+  (let [res (j/query sql-conn "SELECT 1")]
+    {:status 200 :body (str "OK - " (into [] res))}))
+
+(def config
+  {::jdbc/connection    {:connection-uri "jdbc:h2:mem:mem_only"}
+   ::datomic/database   {:db-uri  "datomic:mem://example"
+                         :delete? true}
+   ::datomic/connection {:database (ig/ref ::datomic/database)
+                         :db-uri   "datomic:mem://example"}
+   ::web/server         {:host         "0.0.0.0"
+                         :port         3000
+                         :sql-conn     (ig/ref ::jdbc/connection)
+                         :datomic-conn (ig/ref ::datomic/connection)
+                         :handler      #'app}})
+
+;Note that this is a different approach than what most reloadable systems do.
+(defonce sys (create config))
+
+(start sys)
+;(stop sys)
+```
+
+The second ns I provide, `partsbin.middleware`, provides an elegant and simple solution to the problem of making components available to your web handlers.
+
+The typical web handler always boils down to something like this (be it hand-rolled, compojure, or reitit):
+
+```
+;Simple hand-rolled handler
+(defn handler [request]
+  {:status 200 :body "OK"})
+
+;Compojure fanciness
+(defroutes app
+  (GET "/" [] (ok (html5 [:h1 "Hello World"])))
+  (GET "/time" [] (str "The time is: " (time/now)))
+  (route/not-found "<h1>Page not found</h1>"))
+```
+
+There may be fancy routes and so on, but ultimately it is a function  that takes a request and returns a response. This is challenging to composable apps because you may need a db or other part of your application made available to you. I've seen solutions along the lines of:
+
+```
+(defn system-handler[component]
+  (routes 
+    (GET "/" [] ...some sort of logic that uses the component...)))
+```
+
+This solution is pretty ugly. It still isn't clear how to inject the component into the system and your wrapped function is going to be created at every invocation.
+
+Instead, consider this simple middleware and implementation (in this case using immutant):
+
+```
+(defn wrap-component [handler component]
+  (fn [request] (handler (into component request))))
+
+(defmethod ig/init-key ::server [_ {:keys [handler host port] :as m}]
+  (immutant/run (wrap-component handler m) {:host host :port port}))
+```
+
+This solution pours the request into your configured component (the map used to create the server). I pour the request into the component so that if there are key collisions the request wins. 
+
+The result of this middleware is that when you declare keys like `:datomic-conn (ig/ref  ::datomic/connection)` the referenced component is now injected into your request and is available to your handler. Awesome, right!
+
+Here's what it looks like:
+``` 
+(defn handler [{:keys [datomic-conn] :as request}]
+  (let [db (d/db datomic-conn)]
+    {:status 200 :body (d/q some-query db))}))
+```
+
+Notice that this follows the guiding principles outlined above. This is just a simple function in which I expect a request with a connection that I specified. There's no particular knowledge of partsbin or anything else. I just write the function and let some other aspect of the system worry about creating the right request.
 
 ## Implementations
 

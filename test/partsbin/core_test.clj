@@ -1,6 +1,6 @@
 (ns partsbin.core-test
   (:require [clojure.test :refer :all]
-            [partsbin.core :refer :all]))
+            [partsbin.example :refer :all]))
 
 (deftest a-test
   (testing "I pass."
