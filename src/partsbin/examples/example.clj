@@ -1,4 +1,4 @@
-(ns partsbin.example
+(ns partsbin.examples.example
   (:require [partsbin.core :refer [create start stop restart system]]
             [partsbin.datomic.api.core :as datomic]
             [partsbin.immutant.web.core :as web]

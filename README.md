@@ -101,7 +101,7 @@ Currently, there are two small nses that I use pervasively when building systems
 Should you want to try out my approach, it is as simple as what you see here:
 
 ```
-(ns partsbin.example
+(ns partsbin.example.example
   (:require [partsbin.core :refer [create start stop restart system]]
             [partsbin.datomic.api.core :as datomic]
             [partsbin.immutant.web.core :as web]
