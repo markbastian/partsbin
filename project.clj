@@ -10,4 +10,5 @@
                  [com.datomic/datomic-free "0.9.5697" :scope "provided"]
                  [com.h2database/h2 "1.4.199" :scope "provided"]
                  [com.novemberain/monger "3.1.0" :scope "provided"]
-                 [hawk "0.2.11" :scope "provided"]])
+                 [hawk "0.2.11" :scope "provided"]]
+:repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
