@@ -1,4 +1,4 @@
-(defproject markbastian/partsbin "0.1.0"
+(defproject markbastian/partsbin "0.1.1-SNAPSHOT"
   :description "A project for creating functional, data-driven systems."
   :url "https://github.com/markbastian/partsbin"
   :license {:name "Eclipse Public License"
