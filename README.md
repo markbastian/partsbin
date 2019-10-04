@@ -16,6 +16,11 @@ As such, it can be used in a few ways:
 1. Use the top-level utility methods found in `partsbin.system`, `partsbin.middleware`, etc. but define your own `ig/init-key` methods.
 1. Use the provided implementations of `ig/init-key` as well.
 
+## Installation
+Add the following dependency to your project.clj:
+
+[![Clojars Project](https://img.shields.io/clojars/v/markbastian/partsbin.svg)](https://clojars.org/markbastian/partsbin)
+
 ## Definitions
 
 Since there are multiple frameworks out there for reloadable systems (e.g. [Integrant](https://github.com/weavejester/integrant), [Component](https://github.com/stuartsierra/component), [Mount](https://github.com/tolitius/mount), I need to clarify the following for this discussion:
@@ -183,7 +188,7 @@ Notice that this follows the guiding principles outlined above. This is just a s
 
 ## Implementations
 
-An aim of partsbin is to provide an ever-accreting set of implementations of 'ig/init-key', 'ig/halt-key!' for a variety of libraries that you might use in your systems. To ensure that this is done thoughtfully the following strategy has been taken:
+An aim of partsbin is to provide an ever-accreting set of implementations of `ig/init-key` and `ig/halt-key!` for a variety of libraries that you might use in your systems. To ensure that this is done thoughtfully the following strategy has been taken:
 
 * For each wrapped library, a package is created under partsbin.package.of.wrapped.lib, where the path corresponds to the same ns that would be imported from the library itself. For example, to obtain a jdbc connection using `clojure.java.jdbc`, the function `clojure.java.jdbc/get-connection` is called from the `clojure.java.jdbc` ns. In this case, I would create the package `partsbin.clojure.java.jdbc`.
 * Within the package I use versioned namespaces for each implementation. The following namespaces will be used:
