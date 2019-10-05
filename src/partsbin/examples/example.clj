@@ -3,6 +3,7 @@
             [partsbin.datomic.api.core :as datomic]
             [partsbin.immutant.web.core :as web]
             [partsbin.clojure.java.jdbc.core :as jdbc]
+            [partsbin.datascript.core.core :as ds]
             [clojure.java.jdbc :as j]
             [integrant.core :as ig]))
 
@@ -14,6 +15,7 @@
   {::jdbc/connection    {:connection-uri "jdbc:h2:mem:mem_only"}
    ::datomic/database   {:db-uri  "datomic:mem://example"
                          :delete? true}
+   ::ds/connection      {}
    ::datomic/connection {:database (ig/ref ::datomic/database)
                          :db-uri   "datomic:mem://example"}
    ::web/server         {:host         "0.0.0.0"
