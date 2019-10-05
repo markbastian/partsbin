@@ -7,6 +7,8 @@
 
 (def config {::server {:host    "0.0.0.0"
                        :port    3000
+                       ;https://stackoverflow.com/questions/2706044/how-do-i-stop-jetty-server-in-clojure
+                       :join? false
                        :handler (constantly {:status 200 :body "OK"})}})
 
 (comment
