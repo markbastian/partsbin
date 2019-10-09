@@ -12,5 +12,8 @@
                  [com.h2database/h2 "1.4.199" :scope "provided"]
                  [com.novemberain/monger "3.1.0" :scope "provided"]
                  [hawk "0.2.11" :scope "provided"]
-                 [datascript "0.18.6" :scope "provided"]]
+                 [datascript "0.18.6" :scope "provided"]
+                 [hikari-cp "2.9.0" :scope "provided"]
+                 [seancorfield/next.jdbc "1.0.8" :scope "provided"]
+                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3" :scope "provided"]]
 :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
