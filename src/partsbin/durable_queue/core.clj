@@ -3,15 +3,15 @@
             [durable-queue :refer :all]
             [integrant.core :as ig]))
 
-(derive ::queue ::durable/queue)
+(derive ::queues ::durable/queues)
 
 (def config
-  {::queue {:delete-on-halt? true
-            :directory "/tmp"}})
+  {::queues {:delete-on-halt? true
+             :directory       "/tmp"}})
 
 (comment
   (def sys (ig/init config))
-  (def q (::queue sys))
+  (def q (::queues sys))
   (take! q :my-queue 10 :timed-out!)
   (put! q :my-queue "a task")
   (def task (take! q :my-queue))

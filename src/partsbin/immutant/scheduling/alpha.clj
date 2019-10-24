@@ -4,7 +4,7 @@
             [integrant.core :as ig]))
 
 (defmethod ig/init-key ::job [_ {:keys [job schedule schedule-seq-fn] :as config}]
-  (let [job (partial job config)]
+  (let [job (fn [] (job config))]
     (cond
       schedule (sched/schedule job schedule)
       schedule-seq-fn (schedj/schedule-seq job (take 10 (schedule-seq-fn))))))
