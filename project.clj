@@ -2,7 +2,7 @@
   :description "A project for creating functional, data-driven systems."
   :url "https://github.com/markbastian/partsbin"
   :license {:name "Eclipse Public License"
-            :url "http://www.eclipse.org/legal/epl-v10.html"}
+            :url  "http://www.eclipse.org/legal/epl-v10.html"}
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [integrant "0.7.0"]
                  [org.immutant/web "2.1.10" :scope "provided"]
@@ -15,5 +15,6 @@
                  [datascript "0.18.6" :scope "provided"]
                  [hikari-cp "2.9.0" :scope "provided"]
                  [seancorfield/next.jdbc "1.0.9" :scope "provided"]
-                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3" :scope "provided"]]
-:repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
+                 [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3" :scope "provided"]
+                 [clojurewerkz/quartzite "2.1.0" :scope "provided"]]
+  :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
