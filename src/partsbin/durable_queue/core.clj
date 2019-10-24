@@ -1,9 +1,9 @@
 (ns partsbin.durable-queue.core
-  (:require [partsbin.durable-queue.alpha :as dq]
+  (:require [partsbin.durable-queue.alpha :as durable]
             [durable-queue :refer :all]
             [integrant.core :as ig]))
 
-(derive ::queue ::dq/queue)
+(derive ::queue ::durable/queue)
 
 (def config
   {::queue {:delete-on-halt? true

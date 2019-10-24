@@ -5,6 +5,7 @@
             [partsbin.immutant.web.core :as web]
             [partsbin.clojure.java.jdbc.core :as jdbc]
             [partsbin.datascript.core.core :as ds]
+            [partsbin.durable-queue.core :as durable]
             [clojure.java.jdbc :as j]
             [integrant.core :as ig]
             [datascript.core :as d]
@@ -45,6 +46,8 @@
    ::hawk/watch         {:groups [{:paths   ["example"]
                                    :handler #'file-handler}]
                          :dsdb   (ig/ref ::ds/connection)}
+   ::durable/queue      {:delete-on-halt? true
+                         :directory       "/tmp"}
    ::web/server         {:host         "0.0.0.0"
                          :port         3000
                          :sql-conn     (ig/ref ::jdbc/connection)
