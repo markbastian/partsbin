@@ -16,5 +16,6 @@
                  [hikari-cp "2.9.0" :scope "provided"]
                  [seancorfield/next.jdbc "1.0.9" :scope "provided"]
                  [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3" :scope "provided"]
-                 [clojurewerkz/quartzite "2.1.0" :scope "provided"]]
+                 [clojurewerkz/quartzite "2.1.0" :scope "provided"]
+                 [factual/durable-queue "0.1.5" :scope "provided"]]
   :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
