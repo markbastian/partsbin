@@ -18,10 +18,11 @@
 (defn app [{:keys [sql-conn dsdb] :as request}]
   (let [res (j/query sql-conn "SELECT 1")
         names (d/q
-                '[:find [?name ...]
+                '[:find ?name ?universe
                   :in $
                   :where
-                  [_ :name ?name]]
+                  [?e :name ?name]
+                  [?e :universe ?universe]]
                 @dsdb)]
     {:status 200
      :body   (str "OK - " (into [] res) " - " names)}))
