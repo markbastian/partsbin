@@ -21,8 +21,9 @@
 
   :dependencies [[org.clojure/clojure "1.10.1"]
                  [integrant "0.7.0"]
+                 [com.taoensso/timbre "4.10.0"]
                  [datascript "0.18.7" :scope "provided"]
-                 [etaoin "0.3.2" :scope "provided"]
+                 [etaoin "0.3.5" :scope "provided"]
                  [hawk "0.2.11" :scope "provided"]
                  [hikari-cp "2.9.0" :scope "provided"]
                  [clojure.jdbc/clojure.jdbc-c3p0 "0.3.3" :scope "provided"]

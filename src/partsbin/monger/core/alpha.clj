@@ -1,18 +1,25 @@
 (ns partsbin.monger.core.alpha
   (:require [monger.core :as mg]
-            [integrant.core :as ig]))
+            [integrant.core :as ig]
+            [taoensso.timbre :as timbre]
+            [clojure.pprint :as pp])
+  (:import (com.mongodb.client MongoClient)))
 
-;TODO - Test and verify
 (defmethod ig/init-key ::connection [_ spec]
+  (timbre/debug (format "Initializing Mongo connection with params %s" spec))
   (mg/connect spec))
 
 (defmethod ig/halt-key! ::connection [_ connection]
+  (timbre/debug "Disconnecting from Mongo connection...")
   (mg/disconnect connection))
 
-;TODO - Test and verify
-(defmethod ig/init-key ::uri-connection [_ {:keys [uri]}]
-  (let [{:keys [db conn]} (mg/connect-via-uri uri)]
-    conn))
+(defmethod ig/init-key ::database [_ {:keys [^MongoClient conn db-name]}]
+  (timbre/debug (format "Getting Mongo DB: %s" db-name))
+  (mg/get-db conn db-name))
 
-(defmethod ig/halt-key! ::uri-connection [_ connection]
-  (mg/disconnect connection))
+;TODO - Determine:
+; 1. Do we need to disconnect from a uri connection?
+; 2. The correct thing to return. The conn, the map, etc.
+;(defmethod ig/init-key ::uri-connection [_ {:keys [uri]}]
+;  (let [{:keys [db conn]} (mg/connect-via-uri uri)]
+;    conn))

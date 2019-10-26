@@ -4,7 +4,7 @@
             [partsbin.hawk.core.core :as hawk]
             [partsbin.immutant.web.core :as web]
             [partsbin.clojure.java.jdbc.core :as jdbc]
-            [partsbin.datascript.core.core :as ds]
+            [partsbin.datascript.core.core :as datascript]
             [partsbin.durable-queue.core :as durable]
             [partsbin.immutant.scheduling.core :as scheduling]
             [durable-queue :as dq]
@@ -12,7 +12,6 @@
             [integrant.core :as ig]
             [datascript.core :as d]
             [clojure.edn :as edn]
-            [clojure.pprint :as pp]
             [clojure.string :as cs])
   (:import (java.io File)))
 
@@ -49,28 +48,28 @@
       (dq/complete! task))))
 
 (def config
-  {::jdbc/connection    {:connection-uri "jdbc:h2:mem:mem_only"}
-   ::datomic/database   {:db-uri  "datomic:mem://example"
-                         :delete? true}
-   ::ds/connection      {:name   {:db/unique :db.unique/identity}
-                         :powers {:db/cardinality :db.cardinality/many}}
-   ::datomic/connection {:database (ig/ref ::datomic/database)
-                         :db-uri   "datomic:mem://example"}
-   ::hawk/watch         {:groups [{:paths   ["example"]
-                                   :handler #'file-handler}]
-                         :queue  (ig/ref ::durable/queues)}
-   ::durable/queues     {:delete-on-halt? true
-                         :directory       "/tmp"}
-   ::scheduling/job     {:job      #'deque-job
-                         :schedule {:in [5 :seconds] :every :second}
-                         :queue    (ig/ref ::durable/queues)
-                         :dsdb     (ig/ref ::ds/connection)}
-   ::web/server         {:host         "0.0.0.0"
-                         :port         3000
-                         :sql-conn     (ig/ref ::jdbc/connection)
-                         :datomic-conn (ig/ref ::datomic/connection)
-                         :dsdb         (ig/ref ::ds/connection)
-                         :handler      #'app}})
+  {::jdbc/connection       {:connection-uri "jdbc:h2:mem:mem_only"}
+   ::datomic/database      {:db-uri  "datomic:mem://example"
+                            :delete? true}
+   ::datascript/connection {:name   {:db/unique :db.unique/identity}
+                            :powers {:db/cardinality :db.cardinality/many}}
+   ::datomic/connection    {:database (ig/ref ::datomic/database)
+                            :db-uri   "datomic:mem://example"}
+   ::hawk/watch            {:groups [{:paths   ["example"]
+                                      :handler #'file-handler}]
+                            :queue  (ig/ref ::durable/queues)}
+   ::durable/queues        {:delete-on-halt? true
+                            :directory       "/tmp"}
+   ::scheduling/job        {:job      #'deque-job
+                            :schedule {:in [5 :seconds] :every :second}
+                            :queue    (ig/ref ::durable/queues)
+                            :dsdb     (ig/ref ::datascript/connection)}
+   ::web/server            {:host         "0.0.0.0"
+                            :port         3000
+                            :sql-conn     (ig/ref ::jdbc/connection)
+                            :datomic-conn (ig/ref ::datomic/connection)
+                            :dsdb         (ig/ref ::datascript/connection)
+                            :handler      #'app}})
 
 (defonce sys (create config))
 

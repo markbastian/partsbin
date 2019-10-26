@@ -11,4 +11,5 @@
 (comment
   (def system (ig/init config))
   (let [{conn ::jdbc/connection} system]
-    (j/query conn "SELECT 1")))
+    (j/query conn "SELECT 1"))
+  (ig/halt! system))
