@@ -51,4 +51,7 @@
                  [org.slf4j/slf4j-api "1.7.28" :scope "provided"]
                  [ring/ring-codec "1.1.2" :scope "provided"]
                  [ring/ring-core "1.7.1" :scope "provided"]]
+
+  ;Note that these instructions may need to be followed to release on OS X.
+  ;https://stackoverflow.com/questions/39494631/gpg-failed-to-sign-the-data-fatal-failed-to-write-commit-object-git-2-10-0
   :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])

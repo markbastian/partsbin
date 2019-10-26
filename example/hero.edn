@@ -1,0 +1,4 @@
+[{:name "Batman" :powers [:money :belt]}
+ {:name "Superman" :powers [:flight :speed :strength]}
+ {:name "Wonderwoman" :powers [:flight :speed :strength]}
+ {:name "Wolverine" :powers [:regeneration :heightened-senses :claws]}]
