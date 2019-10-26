@@ -54,4 +54,5 @@
 
   ;Note that these instructions may need to be followed to release on OS X.
   ;https://stackoverflow.com/questions/39494631/gpg-failed-to-sign-the-data-fatal-failed-to-write-commit-object-git-2-10-0
-  :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]])
+  :repositories [["releases" {:url "https://repo.clojars.org" :creds :gpg}]
+                 ["snapshots" {:url "https://repo.clojars.org" :creds :gpg}]])
