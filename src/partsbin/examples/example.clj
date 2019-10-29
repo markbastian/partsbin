@@ -12,22 +12,42 @@
             [integrant.core :as ig]
             [datascript.core :as d]
             [clojure.edn :as edn]
-            [clojure.string :as cs])
-  (:import (java.io File)))
+            [clojure.string :as cs]
+            [clojure.pprint :as pp])
+  (:import (java.io File)
+           (java.util Date)))
 
-(defn app [{:keys [sql-conn dsdb] :as request}]
-  (let [res (j/query sql-conn "SELECT 1")
-        names (d/q
-                '[:find ?name ?universe
-                  :in $
-                  :where
-                  [?e :name ?name]
-                  [?e :universe ?universe]]
-                @dsdb)]
-    {:status 200
-     :body   (str "OK - " (into [] res) " - " names)}))
+(defn heroes-by-universe [dsdb]
+  (d/q
+    '[:find ?name ?universe
+      :in $
+      :where
+      [?e :name ?name]
+      [?e :universe ?universe]]
+    dsdb))
 
-(defn file-handler [{:keys [queue] :as ctx} {:keys [^File file kind] :as event}]
+(defn app [{:keys [sql-conn dsdb path-info] :as request}]
+  (case (cs/lower-case (cs/replace path-info #"/" ""))
+    "supers" {:status 200 :body (with-out-str (pp/pprint (heroes-by-universe @dsdb)))}
+    "files" {:status 200 :body (with-out-str (pp/pprint (j/query sql-conn "SELECT * FROM FILES")))}
+    {:status 404 :body (format "No match for %s" path-info)}))
+
+(def file-table-ddl
+  (j/create-table-ddl
+    :files
+    [[:name "varchar"]
+     [:processed :time]]))
+
+(defn setup [conn]
+  (j/db-do-commands
+    conn
+    [file-table-ddl
+     "CREATE INDEX name_ix ON files ( name );"]))
+
+(defmethod ig/init-key ::jdbc/init [_ {:keys [conn]}]
+  (setup conn))
+
+(defn file-handler [{:keys [queue conn] :as ctx} {:keys [^File file kind] :as event}]
   (when (and (= kind :modify)
              (.exists file)
              (.isFile file)
@@ -37,7 +57,8 @@
       (let [data (edn/read-string (slurp file))]
         (println "Adding data to queue.")
         (doseq [d data]
-          (dq/put! queue :my-queue d)))))
+          (dq/put! queue :my-queue d)))
+      (j/insert! conn :files {:name (.getName file) :processed (Date.)})))
   ctx)
 
 (defn deque-job [{:keys [queue dsdb]}]
@@ -50,15 +71,13 @@
 
 (def config
   {::jdbc/connection       {:connection-uri "jdbc:h2:mem:mem_only"}
-   ::datomic/database      {:db-uri  "datomic:mem://example"
-                            :delete? true}
+   ::jdbc/init             {:conn (ig/ref ::jdbc/connection)}
    ::datascript/connection {:name   {:db/unique :db.unique/identity}
                             :powers {:db/cardinality :db.cardinality/many}}
-   ::datomic/connection    {:database (ig/ref ::datomic/database)
-                            :db-uri   "datomic:mem://example"}
    ::hawk/watch            {:groups [{:paths   ["example"]
                                       :handler #'file-handler}]
-                            :queue  (ig/ref ::durable/queues)}
+                            :queue  (ig/ref ::durable/queues)
+                            :conn   (ig/ref ::jdbc/connection)}
    ::durable/queues        {:delete-on-halt? true
                             :directory       "/tmp"}
    ::scheduling/job        {:job      #'deque-job
@@ -68,7 +87,6 @@
    ::web/server            {:host         "0.0.0.0"
                             :port         3000
                             :sql-conn     (ig/ref ::jdbc/connection)
-                            :datomic-conn (ig/ref ::datomic/connection)
                             :dsdb         (ig/ref ::datascript/connection)
                             :handler      #'app}})
 
