@@ -1,5 +1,5 @@
 (ns partsbin.examples.simple-web-app
-  (:require [partsbin.core :refer [create start stop restart system reset-config!]]
+  (:require [partsbin.core :as partsbin]
             [partsbin.immutant.web.core :as web]
             [clojure.pprint :as pp]))
 
@@ -13,4 +13,4 @@
                  :port    3000
                  :handler #'app}})
 
-(defonce sys (create config))
+(defonce sys (partsbin/create config))
