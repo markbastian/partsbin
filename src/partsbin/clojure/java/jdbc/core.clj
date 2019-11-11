@@ -6,10 +6,10 @@
 (derive ::connection ::jdbc/connection)
 
 (def config
-  {::jdbc/connection {:connection-uri "jdbc:h2:mem:mem_only"}})
+  {::connection {:connection-uri "jdbc:h2:mem:mem_only"}})
 
 (comment
   (def system (ig/init config))
-  (let [{conn ::jdbc/connection} system]
+  (let [{conn ::connection} system]
     (j/query conn "SELECT 1"))
   (ig/halt! system))

@@ -5,21 +5,22 @@
             [integrant.core :as ig]))
 
 (derive ::connection ::jdbc/connection)
+(derive ::datasource ::jdbc/datasource)
 
 (def config
-  {::jdbc/connection {:dbtype "h2:mem" :dbname "mem_only"}
-   ::jdbc/datasource {:dbtype "h2:mem" :dbname "mem_only_ds"}})
+  {::connection {:dbtype "h2:mem" :dbname "mem_only"}
+   ::datasource {:dbtype "h2:mem" :dbname "mem_only_ds"}})
 
 (comment
   (def system (ig/init config))
 
-  (let [{conn ::jdbc/connection} system]
+  (let [{conn ::connection} system]
     (j/execute! conn ["SELECT 1"]))
 
-  (let [{conn ::jdbc/connection} system]
+  (let [{conn ::connection} system]
     (sql/query conn ["SELECT 1"]))
 
-  (let [{conn ::jdbc/datasource} system]
+  (let [{conn ::datasource} system]
     (sql/query conn ["SELECT 1"]))
 
   (ig/halt! system))
