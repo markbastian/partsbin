@@ -12,6 +12,7 @@
                primitive-math
                com.google.code.findbugs/jsr305
                com.google.guava/guava
+               com.taoensso/encore
                org.clojure/tools.logging
                org.clojure/tools.reader
                org.jboss.logging/jboss-logging
@@ -35,8 +36,8 @@
                  [org.clojure/java.jdbc "0.7.10" :scope "provided"]
                  [org.immutant/scheduling "2.1.10" :scope "provided"]
                  [org.immutant/web "2.1.10" :scope "provided"]
-                 [ring/ring-jetty-adapter "1.7.1" :scope "provided"]
-                 [seancorfield/next.jdbc "1.0.9" :scope "provided"]
+                 [ring/ring-jetty-adapter "1.8.0" :scope "provided"]
+                 [seancorfield/next.jdbc "1.0.10" :scope "provided"]
                  ;Just to prevent version conflicts
                  [org.clojure/tools.reader "1.3.2" :scope "provided"]
                  [clj-time "0.15.2" :scope "provided"]
@@ -47,11 +48,12 @@
                  [primitive-math "0.1.6" :scope "provided"]
                  [com.google.code.findbugs/jsr305 "3.0.2" :scope "proivided"]
                  [com.google.guava/guava "23.0" :scope "provided"]
+                 [com.taoensso/encore "2.116.0"]
                  [org.clojure/tools.logging "0.5.0" :scope "provided"]
                  [org.jboss.logging/jboss-logging "3.4.1.Final" :scope "provided"]
                  [org.slf4j/slf4j-api "1.7.29" :scope "provided"]
                  [ring/ring-codec "1.1.2" :scope "provided"]
-                 [ring/ring-core "1.7.1" :scope "provided"]]
+                 [ring/ring-core "1.8.0" :scope "provided"]]
 
   ;Note that these instructions may need to be followed to release on OS X.
   ;https://stackoverflow.com/questions/39494631/gpg-failed-to-sign-the-data-fatal-failed-to-write-commit-object-git-2-10-0
