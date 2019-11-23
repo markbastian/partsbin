@@ -67,13 +67,13 @@ The overarching aim of partsbin is to provide a conceptual framework that facili
   * Bad: `(myfunction datomic-conn sql-conn args)` - Two different parts are used in two positions.
   * Better: `(myfunction {:keys[datomic-conn sql-conn]} args)` - If multiple system components are needed for a single function, combine them using ig/ref to create a single, logical component with all required component.
   * Terrible: `(myfunction {:keys[project-x/datomic-connection project-x/hornetq]} arg1 arg2)` - You are conflating your system with your function. This is making your code system-specific and non-generic.
-* Related to the above, parts should be combined in their initializers. Meaning, if you have some process that takes several parts (e.g. data from a db needs to flow to a queue) then do write functional logic that does the db work and another function that does the queue work then _in the part configuration_ you can put a function that does all the key renaming, function calling, etc.
-* Var quote (e.g. #'(foo) vs foo)) lambdas when they are passed in as config params. This will prevent you from having to reload your system when the function changes.
+* If you want multiple parts in your component (e.g. a database and a queue), combine them using a middleware (described below). Alternatively, do the combination inline when you define your handler. Functionally, these are identical except in the first case you are externalizing the behavior as a standalone function.
+* Var quote (e.g. #'(foo) vs foo)) lambdas/handlers when they are passed in as config params. This will prevent you from having to reload your system when the function changes.
 * Ensure that ig/init *always* succeeds. If exceptional or failure behavior occurs (e.g. a DB is unavailable) it is ok to return a failed or broken state rather than just blowing up initialization. This facilitates investigation and recovery. For example, if you have a repl server running you could jack in and inspect the state or try to restart. If, on the other hand, the application has failed due to your exceptions you are in an irrecoverable and non-debuggable state.
 
 ### Challenges
 
-* If you detect cycles in your dependency graph you likely want to expose your _system_ in some aspect of your API downstream. For example, you want your system viewable from your web server API code. If this happens, this is your code telling you that you need to revisit your architecture since you are trying to make your system global. Instead, do this:
+* If you detect cycles in your dependency graph you are likely attempting to expose your _system_ in some aspect of your API downstream. For example, you want your system viewable from your web server API code. If this happens, this is your code telling you that you need to revisit your architecture since you are trying to make your system global. Instead, do this:
   * Change your API to use only the required capabilities of your system (e.g. a db or a web server) 
   * Put the required capabilities into a component (e.g. put a db reference in your web component)
   * The handler for that component should now have the required capabilites available to it
@@ -101,7 +101,10 @@ The right way to test this could be one of the following:
 
 ## Top Level Utility Methods
 
-Currently, there are two small nses that I use pervasively when building systems that I've captured here. The first is `partsbin.core`, which declares a simple protocol along the lines of what Component does along with some helper methods for modifying the default system configuration. For a similar effort see [integrant-repl](https://github.com/weavejester/integrant-repl). The main difference I take in my approach is that I use an atom along with a simple protocol to manage the system rather than a dynamic var so that it becomes easier to localize the system (or have many) versus a single (start), (stop), etc. set of functions. If you like those other systems better, feel free to use them.
+Currently, there are two small nses that I use pervasively when building systems that I've captured here. 
+
+### partsbin.core
+The first is `partsbin.core`, which declares a simple protocol along the lines of what Component does along with some helper methods for modifying the default system configuration. For a similar effort see [integrant-repl](https://github.com/weavejester/integrant-repl). The main difference I take in my approach is that I use an atom along with a simple protocol to manage the system rather than a dynamic var so that it becomes easier to localize the system (or have many) versus a single (start), (stop), etc. set of functions. If you like those other systems better, feel free to use them.
 
 Should you want to try out my approach, it is as simple as what you see here:
 
@@ -137,9 +140,10 @@ Should you want to try out my approach, it is as simple as what you see here:
 ;(stop sys)
 ```
 
-The second ns I provide, `partsbin.middleware`, provides an elegant and simple solution to the problem of making components available to your web handlers.
+### partsbin.middleware
+The second ns I provide, `partsbin.middleware`, provides an elegant and simple solution to the problem of making components available to your handlers.
 
-The typical web handler always boils down to something like this (be it hand-rolled, compojure, or reitit):
+As an example, the typical web handler always boils down to something like this (be it hand-rolled, compojure, or reitit):
 
 ```
 ;Simple hand-rolled handler
