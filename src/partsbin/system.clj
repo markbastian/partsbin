@@ -10,17 +10,14 @@
     * Functions start, stop, and restart which will do those actions on the system."
   [config]
   `(do
-    (defonce ~(with-meta '*system* {:dynamic true}) nil)
+     (defonce ~(with-meta '*system* {:dynamic true}) nil)
 
-    (defn ~'system [] ~'*system*)
+     (defn ~'system [] ~'*system*)
 
-    (defn ~'start []
-      (alter-var-root ~'#'*system* (fn [~'s] (if-not ~'s (ig/init ~config) ~'s))))
+     (defn ~'start []
+       (alter-var-root ~'#'*system* (fn [~'s] (if-not ~'s (ig/init ~config) ~'s))))
 
-    (defn ~'stop []
-      (alter-var-root ~'#'*system* (fn [~'s] (when ~'s (do (ig/halt! ~'s) nil)))))
+     (defn ~'stop []
+       (alter-var-root ~'#'*system* (fn [~'s] (when ~'s (do (ig/halt! ~'s) nil)))))
 
-    (defn ~'restart [] (do (~'stop) (~'start)))))
-
-(comment
-  )
+     (defn ~'restart [] (do (~'stop) (~'start)))))
