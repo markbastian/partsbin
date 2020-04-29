@@ -21,3 +21,10 @@
        (alter-var-root ~'#'*system* (fn [~'s] (when ~'s (do (ig/halt! ~'s) nil)))))
 
      (defn ~'restart [] (do (~'stop) (~'start)))))
+
+(defmacro with-system [[bindings config] & body]
+  `(let [system# (ig/init ~config)
+         ~bindings system#]
+     (try
+       ~@body
+       (finally (ig/halt! system#)))))

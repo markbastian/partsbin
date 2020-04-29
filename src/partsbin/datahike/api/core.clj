@@ -7,7 +7,7 @@
 (derive ::connection ::datahike/connection)
 
 (comment
-  (require '[partsbin.system :refer [create-system]])
+  (require '[partsbin.system :refer [with-system]])
 
   (def schema
     [{:db/ident       :name
@@ -19,20 +19,14 @@
                              :initial-tx      schema}
                ::connection {:db-config (ig/ref ::database)}})
 
-  (create-system config)
-
-  (start)
-
-  (let [{conn ::connection} (system)]
+  (with-system
+    [{conn ::connection} config]
     (d/transact conn [{:name "Mark"}
-                      {:name "Becky"}]))
-
-  (let [{conn ::connection} (system)]
+                      {:name "Becky"}])
     (d/q
       '[:find [?n ...]
         :in $
         :where
         [_ :name ?n]]
       @conn))
-
-  (stop))
+  )
